@@ -614,12 +614,13 @@ function startTicker(){
       ticker=null;
       stopMusic();
       render();
-      const audio = new Audio(AUDIO_DOOR_NAAR_ONDER);
+      const audio = VOICE_AUDIO['doorNaarOnder'] || new Audio(AUDIO_DOOR_NAAR_ONDER);
+      audio.currentTime = 0;
       audio.play().catch(()=>{});
       audio.addEventListener('ended', ()=>{
         startMusic();
         startTicker();
-      });
+      }, {once:true});
       // Fallback
       setTimeout(()=>{ if(!ticker){ startMusic(); startTicker(); } }, 4000);
       pz=zi; ps=si;
@@ -664,7 +665,8 @@ function doStart(){
   pz=-1;ps=-1;elapsed=0;phase="intro";
   ticker=null;
   render(); // show UI but timer not running yet (phase="intro")
-  const intro = new Audio(AUDIO_BEGINNEN_BOVEN);
+  const intro = VOICE_AUDIO['beginnen'] || new Audio(AUDIO_BEGINNEN_BOVEN);
+  intro.currentTime = 0;
   intro.play().catch(()=>{});
   function beginBrushing(){
     if(phase!=="intro") return; // prevent double trigger
@@ -673,7 +675,7 @@ function doStart(){
     startTicker();
     render();
   }
-  intro.addEventListener('ended', beginBrushing);
+  intro.addEventListener('ended', beginBrushing, {once:true});
   // Safety fallback after 5 seconds
   setTimeout(beginBrushing, 5000);
 }
