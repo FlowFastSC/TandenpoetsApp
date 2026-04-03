@@ -76,7 +76,8 @@ button{cursor:pointer;border:none;font-family:'Fredoka One',cursive;-webkit-tap-
 <body>
 <div id="header">
   <span id="brush-icon">🪥</span>
-  <h1>Tijd om te poetsen!</h1>
+  <h1 id="main-title">Tijd om te poetsen!</h1>
+<div id="congrats-above" style="display:none;text-align:center;"><div style="font-size:22px;color:#d63870;font-family:'Fredoka One',cursive;text-shadow:1px 1px 0 #ffb8d4;">Geweldig gepoetst!</div><div style="font-size:13px;color:#e06030;font-family:Nunito,sans-serif;font-weight:800;">Jij bent een kampioen! 🏆</div></div>
 </div>
 <div id="zone-above" style="display:none;text-align:center;font-size:15px;color:#d63870;font-family:Nunito,sans-serif;font-weight:800;padding:2px 0;flex-shrink:0;"></div>
 <div id="visual">
@@ -401,8 +402,6 @@ button{cursor:pointer;border:none;font-family:'Fredoka One',cursive;-webkit-tap-
   </div>
   <div id="done-screen" style="display:none">
     <div id="done-stars">🎉 ⭐ 🎊 ⭐ 🎉</div>
-    <div id="done-title">Geweldig gepoetst!</div>
-    <div id="done-sub">Jij bent een kampioen! 🏆</div>
     <img id="bear-gif" src="" alt="dansende beer"/>
   </div>
 </div>
@@ -482,7 +481,7 @@ function startMusic(){
   if(!bgMusic){
     bgMusic = new Audio(AUDIO_MUSIC);
     bgMusic.loop = true;
-    bgMusic.volume = 0.18;
+    bgMusic.volume = 0.10;
   }
   bgMusic.currentTime = MUSIC_START_SEC;
   bgMusic.play().catch(()=>{});
@@ -550,6 +549,9 @@ function render(){
     document.getElementById('bear-gif').src = gif;
   }
   document.getElementById('header').style.display = (phase==="brushing"||phase==="intro")?"none":"";
+  // On done: hide h1, show congrats above card
+  document.getElementById('main-title').style.display = phase==="done"?"none":"";
+  document.getElementById('congrats-above').style.display = phase==="done"?"":"none";
   document.getElementById('brush-icon').style.animation = (phase==="brushing"||phase==="intro")?"bounce .75s infinite":"none";
   const brushing=(phase==="brushing"||phase==="intro")&&zone;
   document.getElementById('zone-label').style.display = phase==="done"?"none":"flex";
@@ -576,6 +578,8 @@ function render(){
     document.getElementById('timer').textContent=mins+':'+(secs<10?'0':'')+secs;
     document.getElementById('timer').style.animation=secs<=5&&mins===0?"sparkle .4s infinite":"none";
     document.getElementById('zone-counter').textContent='Zone '+(zi+1)+'/6';
+    document.getElementById('timer-label').style.display='none';
+    document.getElementById('zone-counter').style.display='none';
     document.getElementById('sub-right').textContent=sub.icon+' '+sub.label+' · '+(sd-se)+'s';
     const sb=document.getElementById('seg-bar'),sn=document.getElementById('sub-names');
     sb.innerHTML='';sn.innerHTML='';
