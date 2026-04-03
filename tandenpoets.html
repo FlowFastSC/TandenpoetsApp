@@ -615,6 +615,8 @@ function startTicker(){
       return;
     }
     if(zc&&pz>=0)playZoneDone();else if(sc&&!zc&&ps>=0)playSubDone();
+    // Voice cues — only when not at the very end
+    if(elapsed < TOTAL_TIME){
     // Voice cues for top molar zones (0=rechts boven, 2=links boven)
     if((zi===0||zi===2) && (zc||sc)){
       const ze2=elapsed%ZONE_DURATION;
@@ -641,6 +643,7 @@ function startTicker(){
       if(ze2<1||zc){ playVoice(AUDIO_VOORKANT_ONDERTANDEN); }
       else if(ze2>=10&&ze2<11){ playVoice(AUDIO_ACHTERKANT_ONDERTANDEN); }
     }
+    } // end voice cues guard
     pz=zi;ps=si;
     if(elapsed>=TOTAL_TIME){clearInterval(ticker);phase="done";stopMusic();playFinish();}
     render();
