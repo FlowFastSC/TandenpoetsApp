@@ -510,8 +510,8 @@ function render(){
   const doneIds=phase==="brushing"?ZONES.slice(0,zi).map(z=>z.id):phase==="done"?ZONES.map(z=>z.id):[];
   document.getElementById('svg-wrap').style.display    = phase==="done"?"none":"flex";
   document.getElementById('done-screen').style.display = phase==="done"?"flex":"none";
-  document.getElementById('brush-icon').style.animation = phase==="brushing"?"bounce .75s infinite":"none";
-  const brushing=phase==="brushing"&&zone;
+  document.getElementById('brush-icon').style.animation = (phase==="brushing"||phase==="intro")?"bounce .75s infinite":"none";
+  const brushing=(phase==="brushing"||phase==="intro")&&zone;
   document.getElementById('zone-label').style.display = phase==="done"?"none":"flex";
   document.getElementById('idle-msg').style.display   = phase==="idle"?"":"none";
   document.getElementById('zone-name').style.display  = brushing?"":"none";
@@ -525,7 +525,8 @@ function render(){
     document.getElementById('sub-badge').style.background=sub.color;
     document.getElementById('sub-desc').textContent=sub.desc;
   }
-  document.getElementById('progress').style.display=brushing?"block":"none";
+  const showProgress = phase==="brushing" && zone;
+  document.getElementById('progress').style.display=showProgress?"block":"none";
   if(brushing){
     const sub=zone.subs[si];
     document.getElementById('total-bar').style.width=(elapsed/TOTAL_TIME*100)+'%';
@@ -559,7 +560,7 @@ function render(){
     dots.appendChild(d);
   });
   document.getElementById('btn-start').style.display = phase==="idle"?"":"none";
-  document.getElementById('btn-reset').style.display = phase==="brushing"?"":"none";
+  document.getElementById('btn-reset').style.display = (phase==="brushing"||phase==="intro")?"":"none";
   document.getElementById('btn-again').style.display = phase==="done"?"":"none";
   updateSVG();
 }
@@ -593,24 +594,23 @@ function startTicker(){
   },1000);
 }
 function doStart(){
-  pz=-1;ps=-1;elapsed=0;phase="brushing";
-  render(); // show brushing UI immediately
-  // Play "We beginnen boven!" then start music + timer after it finishes
+  pz=-1;ps=-1;elapsed=0;phase="intro";
+  ticker=null;
+  render(); // show UI but timer not running yet (phase="intro")
   const intro = new Audio(AUDIO_BEGINNEN_BOVEN);
   intro.play().catch(()=>{});
-  intro.addEventListener('ended', ()=>{
+  function beginBrushing(){
+    if(phase!=="intro") return; // prevent double trigger
+    phase="brushing";
     startMusic();
     startTicker();
-  });
-  // Safety fallback: if audio fails to fire 'ended', start after 4 seconds
-  setTimeout(()=>{
-    if(elapsed===0 && phase==="brushing" && !ticker){
-      startMusic();
-      startTicker();
-    }
-  }, 4000);
+    render();
+  }
+  intro.addEventListener('ended', beginBrushing);
+  // Safety fallback after 5 seconds
+  setTimeout(beginBrushing, 5000);
 }
-function doReset(){clearInterval(ticker);stopMusic();elapsed=0;phase="idle";pz=-1;ps=-1;render();}
+function doReset(){clearInterval(ticker);ticker=null;stopMusic();elapsed=0;phase="idle";pz=-1;ps=-1;render();}
 // iOS requires AudioContext to be created AND resumed synchronously
 // inside a direct user gesture handler (touchend or click).
 function ensureAudio(){
