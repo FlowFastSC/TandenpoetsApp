@@ -78,6 +78,7 @@ button{cursor:pointer;border:none;font-family:'Fredoka One',cursive;-webkit-tap-
   <span id="brush-icon">🪥</span>
   <h1>Tijd om te poetsen!</h1>
 </div>
+<div id="zone-above" style="display:none;text-align:center;font-size:15px;color:#d63870;font-family:Nunito,sans-serif;font-weight:800;padding:2px 0;flex-shrink:0;"></div>
 <div id="visual">
   <div id="svg-wrap">
 <svg style="width:100%;height:auto;display:block"
@@ -414,7 +415,7 @@ button{cursor:pointer;border:none;font-family:'Fredoka One',cursive;-webkit-tap-
 <div id="progress">
   <div id="timer-row"><span id="timer-label">Totaal</span><span id="timer">2:00</span><span id="zone-counter">Zone 1/6</span></div>
   <div id="total-bar-bg"><div id="total-bar"></div></div>
-  <div id="sub-row"><span id="sub-left">Kant</span><span id="sub-right"></span></div>
+  <div id="sub-row" style="display:none"><span id="sub-left">Kant</span><span id="sub-right"></span></div>
   <div id="seg-bar"></div>
   <div id="sub-names"></div>
 </div>
@@ -548,13 +549,17 @@ function render(){
     const gif = REWARD_GIFS[Math.floor(Math.random()*REWARD_GIFS.length)];
     document.getElementById('bear-gif').src = gif;
   }
+  document.getElementById('header').style.display = (phase==="brushing"||phase==="intro")?"none":"";
   document.getElementById('brush-icon').style.animation = (phase==="brushing"||phase==="intro")?"bounce .75s infinite":"none";
   const brushing=(phase==="brushing"||phase==="intro")&&zone;
   document.getElementById('zone-label').style.display = phase==="done"?"none":"flex";
   document.getElementById('idle-msg').style.display   = phase==="idle"?"":"none";
-  document.getElementById('zone-name').style.display  = brushing?"":"none";
+  document.getElementById('zone-name').style.display  = "none"; // now shown above mouth
   document.getElementById('sub-badge').style.display  = brushing?"inline-flex":"none";
   document.getElementById('sub-desc').style.display   = brushing?"":"none";
+  // Zone label above mouth
+  const za = document.getElementById('zone-above');
+  if(za){ za.style.display = brushing?"":"none"; if(brushing) za.textContent='✨ '+zone.label+' ✨'; }
   if(brushing){
     const sub=zone.subs[si];
     document.getElementById('zone-name').textContent='✨ '+zone.label+' ✨';
@@ -598,7 +603,7 @@ function render(){
     dots.appendChild(d);
   });
   document.getElementById('btn-start').style.display = phase==="idle"?"":"none";
-  document.getElementById('btn-reset').style.display = (phase==="brushing"||phase==="intro")?"":"none";
+  document.getElementById('btn-reset').style.display = "none"; // removed per design
   document.getElementById('btn-again').style.display = phase==="done"?"":"none";
   updateSVG();
 }
