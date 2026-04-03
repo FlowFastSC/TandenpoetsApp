@@ -462,18 +462,20 @@ let phase="idle",elapsed=0,ticker=null,pz=-1,ps=-1;
 let actx=null;
 function getCtx(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();return actx;}
 let bgMusic = null;
+const MUSIC_START_SEC = 10; // skip silent intro
 function startMusic(){
   if(!bgMusic){
     bgMusic = new Audio(AUDIO_MUSIC);
     bgMusic.loop = true;
-    bgMusic.volume = 0.18; // quiet background
+    bgMusic.volume = 0.18;
   }
-  bgMusic.currentTime = bgMusic.currentTime || 0;
+  bgMusic.currentTime = MUSIC_START_SEC;
   bgMusic.play().catch(()=>{});
 }
 function stopMusic(){
   if(bgMusic){
     bgMusic.pause();
+    bgMusic.currentTime = MUSIC_START_SEC; // reset to start point for next session
   }
 }
 function chime(ff){const c=getCtx();c.resume().catch(()=>{});ff.forEach(([f,dl])=>{const o=c.createOscillator(),g=c.createGain();o.type="triangle";o.frequency.value=f;const t=c.currentTime+dl;g.gain.setValueAtTime(.35,t);g.gain.exponentialRampToValueAtTime(.001,t+.5);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.55);});}
