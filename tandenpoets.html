@@ -619,6 +619,8 @@ function startTicker(){
       audio.play().catch(()=>{});
       audio.addEventListener('ended', ()=>{
         startMusic();
+        // Play the first bottom-zone voice cue immediately (zi=3)
+        setTimeout(()=>{ playVoice(AUDIO_BOVENKANT_KIEZEN); }, 100);
         startTicker();
       }, {once:true});
       // Fallback
