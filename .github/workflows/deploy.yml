@@ -1,0 +1,17 @@
+name: Deploy to Coolify
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via Coolify API
+        run: |
+          curl -s -X POST \
+            "https://coolify.flowfast.ai/api/v1/deploy?uuid=lgxjdrooy8vddbuzk7412d6d&force=false" \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
+            --fail
